@@ -32,7 +32,7 @@ export default function Navbar() {
           <Link to="/products" className="hover:text-indigo-600 transition">
             Products
           </Link>
-         
+
           {isAdmin && (
             <Link
               to="/admin/products"
@@ -70,38 +70,38 @@ export default function Navbar() {
 
               {/* User menu */}
               <div className="relative">
-      {/* Profile Button */}
-      <div
-        onClick={() => setOpen(!open)}
-        className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm cursor-pointer"
-      >
-        {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase()}
-      </div>
+                {/* Profile Button */}
+                <div
+                  onClick={() => setOpen(!open)}
+                  className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm cursor-pointer"
+                >
+                  {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase()}
+                </div>
 
-      {/* Dropdown */}
-      {open && (
-        <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border z-50">
-          <Link
-            to="/profile"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            onClick={() => setOpen(false)}
-          >
-            Profile
-          </Link>
+                {/* Dropdown */}
+                {open && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border z-50">
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setOpen(false)}
+                    >
+                      Profile
+                    </Link>
 
-          <button
-            onClick={() => {
-              setOpen(false);
-              handleLogout();
-            }}
-            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-500"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-    </div>
-  
+                    <button
+                      onClick={() => {
+                        setOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+
             </>
           ) : (
             <>

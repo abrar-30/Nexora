@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
 import Spinner from "./components/ui/Spinner";
@@ -56,10 +57,11 @@ const AdminProductDetailPage = lazy(() =>
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Toaster position="top-right" />
-        <Suspense fallback={<Spinner />}>
-          <Routes>
+      <CartProvider>
+        <BrowserRouter>
+          <Toaster position="top-right" />
+          <Suspense fallback={<Spinner />}>
+            <Routes>
             {/* Auth pages — no navbar */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -150,6 +152,7 @@ function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   );
 }

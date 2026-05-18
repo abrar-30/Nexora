@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { productService } from "../api/productService";
 import { useAuth } from "../hooks/useAuth";
+import { useCart } from "../context/CartContext";
 import Spinner from "../components/ui/Spinner";
 import { cartService } from "../api/cartService";
 import React from "react";
@@ -21,6 +22,11 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const [loading, setLoading] = useState(true);
+
+  // Cart state from context
+  const { cart, updateCart } = useCart();
+  const cartItems = cart?.cartItems || [];
+  const [cartUpdating, setCartUpdating] = useState(false);
 
   // const [alert, setAlert] = useState(null);
 
@@ -120,16 +126,32 @@ export default function ProductDetailPage() {
       return;
     }
     try {
-      await cartService.manageItem(selectedVariant?.variantId, 1);
+      setCartUpdating(true);
+      const res = await cartService.manageItem(selectedVariant?.variantId, 1);
+      updateCart(res.data);
       toast.success("Item added to cart 🛒");
-
     } catch (err) {
       console.error(err);
       toast.error("Failed to add item to cart");
+    } finally {
+      setCartUpdating(false);
     }
+  };
 
-    // console.log("Product:", product.productId);
-    // console.log("Variant:", selectedVariant?.variantId);
+  // 🔄 Update quantity
+  const handleUpdateQuantity = async (newQty) => {
+    if (!isAuthenticated) return;
+    try {
+      setCartUpdating(true);
+      const res = await cartService.manageItem(selectedVariant?.variantId, newQty);
+      updateCart(res.data);
+      if (newQty === 0) toast.success("Item removed from cart");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update cart");
+    } finally {
+      setCartUpdating(false);
+    }
   };
 
   // ⚡ Buy now
@@ -167,6 +189,10 @@ export default function ProductDetailPage() {
 
   const finalPrice = addTax(basePrice);
   const finalMrp = addTax(mrp);
+
+  const currentCartItem = cartItems.find(
+    (item) => item.productVariantId === selectedVariant?.variantId
+  );
 
   // 🧪 Debug
   // console.log({ basePrice, mrp, finalPrice, finalMrp });
@@ -298,17 +324,40 @@ export default function ProductDetailPage() {
         )}
 
         {/* ACTION BUTTONS */}
-        <div className="flex gap-3">
-          <button
-            onClick={handleAddToCart}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700"
-          >
-            Add to Cart
-          </button>
+        <div className="flex gap-3 mt-4">
+          {currentCartItem ? (
+            <div className="flex items-center border-2 border-indigo-600 rounded-lg overflow-hidden bg-white h-[48px]">
+              <button
+                onClick={() => handleUpdateQuantity(currentCartItem.quantity - 1)}
+                disabled={cartUpdating}
+                className="w-12 h-full flex items-center justify-center text-indigo-600 hover:bg-indigo-50 disabled:opacity-50 transition cursor-pointer text-xl"
+              >
+                −
+              </button>
+              <span className="w-10 text-center text-sm font-bold text-gray-800">
+                {cartUpdating ? "..." : currentCartItem.quantity}
+              </span>
+              <button
+                onClick={() => handleUpdateQuantity(currentCartItem.quantity + 1)}
+                disabled={cartUpdating}
+                className="w-12 h-full flex items-center justify-center text-indigo-600 hover:bg-indigo-50 disabled:opacity-50 transition cursor-pointer text-xl"
+              >
+                +
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={cartUpdating}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition cursor-pointer h-[48px] flex items-center justify-center font-medium"
+            >
+              {cartUpdating ? "Adding..." : "Add to Cart"}
+            </button>
+          )}
 
           <button
             onClick={handleBuyNow}
-            className="border px-6 py-3 rounded-lg hover:bg-gray-100"
+            className="border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-100 transition cursor-pointer h-[48px] flex items-center justify-center font-medium text-gray-700"
           >
             Buy Now
           </button>

@@ -33,7 +33,9 @@ export default function LoginPage() {
     try {
       const role = await login(form)
       toast.success('Welcome back!')
-      navigate(role === 'ADMIN' ? '/admin/products' : '/')
+      const redirect = localStorage.getItem('redirectAfterLogin')
+      localStorage.removeItem('redirectAfterLogin')
+      navigate(redirect || (role === 'ROLE_ADMIN' ? '/admin' : '/'))
     } catch (err) {
       const msg = err.response?.data?.message || 'Invalid email or password'
       toast.error(msg)

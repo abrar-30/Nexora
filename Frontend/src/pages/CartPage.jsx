@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { cartService } from "../api/cartService";
 import { productService } from "../api/productService";
+import { useCart } from "../context/CartContext";
 import Spinner from "../components/ui/Spinner";
 import toast from "react-hot-toast";
 
 export default function CartPage() {
   const navigate = useNavigate();
-  const [cart, setCart] = useState(null);
+  const { cart, updateCart } = useCart();
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [imagesMap, setImagesMap] = useState({}); // variantId → imageUrl
@@ -21,7 +22,7 @@ export default function CartPage() {
       setLoading(true);
       const res = await cartService.getCart();
       const cartData = res.data;
-      setCart(cartData);
+      updateCart(cartData);
 
       // Fetch images for each cart item
       const imagePromises = cartData.cartItems.map(async (item) => {
@@ -72,7 +73,7 @@ export default function CartPage() {
     try {
       setUpdatingId(variantId);
       const res = await cartService.manageItem(variantId, newQty);
-      setCart(res.data);
+      updateCart(res.data);
       if (newQty === 0) toast.success("Item removed");
     } catch {
       toast.error("Failed to update cart");
@@ -84,7 +85,7 @@ export default function CartPage() {
   const handleClearCart = async () => {
     try {
       const res = await cartService.clearCart();
-      setCart(res.data);
+      updateCart(res.data);
       toast.success("Cart cleared");
     } catch {
       toast.error("Failed to clear cart");
