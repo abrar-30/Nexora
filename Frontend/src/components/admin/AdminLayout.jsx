@@ -5,6 +5,7 @@ const navItems = [
   { to: '/admin', label: 'Dashboard', icon: '📊' },
   { to: '/admin/products', label: 'Products', icon: '📦' },
   { to: '/admin/categories', label: 'Categories', icon: '🗂️' },
+  { to: '/admin/brands',     label: 'Brands',     icon: '🏷️' },
   { to: '/admin/orders',     label: 'Orders',     icon: '🛍️' },
   { to: '/admin/payments',   label: 'Payments',   icon: '💳' },
   { to: '/admin/stock',      label: 'Stock',       icon: '🏪' },
@@ -38,7 +39,7 @@ export default function AdminLayout() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
