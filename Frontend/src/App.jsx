@@ -32,6 +32,9 @@ const AdminProductCreatePage = lazy(() =>
 );
 const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 const AdminStockPage = lazy(() => import("./pages/admin/AdminStockPage"));
+const AdminOrdersPage = lazy(() => import("./pages/admin/AdminOrdersPage"));
+const AdminPaymentsPage = lazy(() => import("./pages/admin/AdminPaymentsPage"));
+const AdminStockTransactionsPage = lazy(() => import("./pages/admin/AdminStockTransactionsPage"));
 const AdminUnitsPage = lazy(() => import("./pages/admin/Unit/AdminUnitsPage"));
 const AdminTaxSlabsPage = lazy(() =>
   import("./pages/admin/TaxSlab/AdminTaxSlabsPage"),
@@ -132,7 +135,10 @@ function App() {
               />
               <Route path="products/:id" element={<AdminProductDetailPage />} />
               <Route path="categories" element={<AdminCategoriesPage />} />
+              <Route path="orders" element={<AdminOrdersPage />} />
+              <Route path="payments" element={<AdminPaymentsPage />} />
               <Route path="stock" element={<AdminStockPage />} />
+              <Route path="stock-transactions" element={<AdminStockTransactionsPage />} />
               <Route path="tax-slabs" element={<AdminTaxSlabsPage />} />
               <Route path="units" element={<AdminUnitsPage />} />
               <Route path="countries" element={<AdminCountriesPage />} />

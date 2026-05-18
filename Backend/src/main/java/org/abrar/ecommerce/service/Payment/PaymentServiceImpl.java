@@ -2,6 +2,7 @@ package org.abrar.ecommerce.service.Payment;
 
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityManager;
+import org.abrar.ecommerce.dto.PaymentDTO;
 import org.abrar.ecommerce.entity.Order;
 import org.abrar.ecommerce.entity.Payment;
 import org.abrar.ecommerce.entity.enums.OrderStatus;
@@ -15,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -197,5 +201,26 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         return stripeService.createCheckoutSession(payment.getOrder());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaymentDTO> getAllPayments() {
+        log.info("🔍 [getAllPayments] Fetching all payments from database");
+        List<Payment> payments = paymentRepository.findAll();
+        log.info("✅ [getAllPayments] Found {} payments", payments.size());
+        return payments.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private PaymentDTO convertToDTO(Payment payment) {
+        PaymentDTO dto = new PaymentDTO();
+        dto.setPaymentId(payment.getPaymentId());
+        dto.setOrderId(payment.getOrder() != null ? payment.getOrder().getOrderId() : null);
+        dto.setTransactionId(payment.getTransactionId());
+        dto.setPaymentMethod(payment.getPaymentMethod());
+        dto.setPaymentStatus(payment.getPaymentStatus());
+        return dto;
     }
 }

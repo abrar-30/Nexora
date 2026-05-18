@@ -10,6 +10,8 @@ import org.abrar.ecommerce.entity.enums.PaymentStatus;
 import org.abrar.ecommerce.exception.ResourceNotFoundException;
 import org.abrar.ecommerce.exception.UserNotFoundException;
 import org.abrar.ecommerce.repository.*;
+import org.abrar.ecommerce.repository.StockTransactionRepository;
+import org.abrar.ecommerce.entity.StockTransaction;
 import org.abrar.ecommerce.service.stripe.StripeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private StockMasterRepository stockMasterRepository;
+
+    @Autowired
+    private StockTransactionRepository stockTransactionRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -373,6 +378,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void deductStockForOrder(Order order) {
         if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return;
 
@@ -407,6 +413,17 @@ public class OrderServiceImpl implements OrderService {
                 double newQty = batchQty - deduct;
 
                 stockMasterRepository.updateStockQuantity(batch.getStockId(), newQty);
+
+                // Create StockTransaction record for this deduction
+                StockTransaction tx = new StockTransaction();
+                tx.setProductVariant(batch.getVariant());
+                tx.setInQuantity(0.0);
+                tx.setOutQuantity(deduct);
+                tx.setDescription("Order deduction for orderId=" + order.getOrderId() + ", orderItem=" + item.getOrderItemId());
+                tx.setOrderId(order.getOrderId());
+                tx.setLandingCost(null);
+                tx.setSellingPrice(item.getPriceAtPurchase());
+                stockTransactionRepository.save(tx);
 
                 requiredQty -= deduct;
             }

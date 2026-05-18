@@ -24,14 +24,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.abrar.ecommerce.dto.ApiResponse;
+import org.abrar.ecommerce.dto.PaymentDTO;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -248,6 +252,15 @@ public class PaymentController {
 			ex.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Webhook error: " + ex.getMessage());
 		}
+	}
+
+	// GET ALL PAYMENTS
+	@GetMapping
+	public ResponseEntity<ApiResponse<List<PaymentDTO>>> getAllPayments() {
+		log.info("📋 [getAllPayments] Fetching all payments");
+		List<PaymentDTO> payments = paymentService.getAllPayments();
+		log.info("✅ [getAllPayments] Retrieved {} payments", payments.size());
+		return ResponseEntity.ok(ApiResponse.success("Payments fetched successfully", payments));
 	}
 }
 
